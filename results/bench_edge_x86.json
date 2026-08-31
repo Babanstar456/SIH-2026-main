@@ -1,0 +1,35 @@
+{
+ "device": "x86_64",
+ "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+ "python": "3.14.4",
+ "onnx": "/home/tathagata/SIH-2026-main/artifacts/model_lowsnr_simple.onnx",
+ "model_size_kb": 390.2333984375,
+ "hop_ms": 16.0,
+ "window_ms": 32.0,
+ "onnx_runs": [
+  {
+   "threads": 1,
+   "frames": 800,
+   "ms_p50": 3.1525739996141056,
+   "ms_p95": 4.386780150707636,
+   "ms_p99": 4.919344881345751,
+   "ms_mean": 3.304000793755222,
+   "ms_max": 7.02974500018172,
+   "rtf_mean": 0.20650004960970136,
+   "rtf_p95": 0.2741737594192272
+  }
+ ],
+ "measured_streaming_delay": {
+  "delay_samples": 257,
+  "delay_ms": 16.0625,
+  "equals_win_minus_hop": false
+ },
+ "latency_budget_ms": {
+  "chunk_buffering": 16.0,
+  "overlap_add_delay_measured": 16.0625,
+  "model_compute_p95": 4.386780150707636,
+  "total_p95": 36.44928015070764
+ },
+ "rtf_pass": true,
+ "latency_pass": false
+}
