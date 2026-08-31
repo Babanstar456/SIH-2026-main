@@ -1,0 +1,23 @@
+loading whisper-small on cpu ...
+
+file                                  NATO  digits    grid     TOTAL 
+                                       /12     /10      /4       /26
+floor_9dB.wav                            0       1       0      1   4%
+floor_18dB.wav                           0       1       0      1   4%
+floor_18dB.wav                           4      10       4     18  69%
+
+(scale: >90%% operational, 70-89%% usable with repeats, 40-69%% marginal, <40%% not usable)
+  floor_9dB.wav                  missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_18dB.wav                 missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_18dB.wav                 missed NATO: alpha, delta, echo, foxtrot, sierra, tango, xray, zulu
+
+--- transcripts ---
+
+[floor_9dB.wav]
+She says she cares for the simple, the whole chip chip is too fast for speech.  People check the pitch type of plates by machine.  This is the best of the three transmission systems.  with less than immediate support at your front sets.  Say that again.  Staying in while gasping,  don't take your heart away.  Message to you and understood.  I'll see you soon.
+
+[floor_18dB.wav]
+One more tip there is to escape as soon as possible.  One thing to keep in mind is that if you are a student of the U.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.A.M.
+
+[floor_18dB.wav]
+She serves in charge of the system.  The whole ship ship is free for that purpose.  You can check the free staff of plates.  This is the test of the free transmission system.  I saw Bravo, Charlie, Lee, Lee, Lee, Pops, Jack, Tira, Tano, Victor, Whiskey, X-ray,  Stephen, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0.  Come on, this is Bravo 2, radio check over.  Position secured at grid 472 miles.  Reflective immediate support at grid 1 sets.  Say that again.  Say again while last.  Stop taking off.  Message received.  And understood.

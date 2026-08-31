@@ -1,0 +1,50 @@
+# Fine-tuning configuration.
+#
+# We fine-tune from the released DNS3 checkpoint rather than training from
+# scratch: with 48K parameters the pretrained weights already encode a good
+# speech/noise decision, and our job is to make it hold up when the noise is
+# gunfire instead of a cafe.
+
+init:
+  # "" trains from scratch; a path fine-tunes from it.
+  checkpoint: checkpoints/pretrained/model_trained_on_dns3.tar
+
+data:
+  epoch_size: 10000        # mixtures per virtual epoch (generated on the fly)
+  val_size: 400            # deterministic-by-seed, identical every epoch
+  batch_size: 24           # ~4.5 GB on a 6 GB card at 4 s crops
+  num_workers: 8
+  seed: 1337
+
+optim:
+  epochs: 60
+  lr: 3.0e-4               # modest: this is a fine-tune, not a cold start
+  weight_decay: 1.0e-5
+  betas: [0.9, 0.999]
+  grad_clip: 5.0
+  warmup_steps: 500
+  scheduler: cosine
+  min_lr: 1.0e-6
+
+loss:
+  # Upstream GTCRN HybridLoss weights, kept so fine-tuning continues under the
+  # objective the pretrained weights were produced with.
+  w_mag: 70.0
+  w_ri: 30.0
+  w_sisnr: 1.0
+  # Our addition. Set to 0.0 to reproduce the upstream objective exactly -
+  # that ablation is what proves the transient term is doing work.
+  w_transient: 2.5
+
+# fp32 throughout. AMP buys almost nothing on a 48K-parameter model, the run is
+# dataloader-bound rather than GPU-bound, and fp16 STFT/iSTFT is a known source
+# of silent numerical trouble. Not worth the risk for no speedup.
+precision: fp32
+
+checkpoint:
+  dir: checkpoints
+  save_every_epoch: true
+  keep_last: 3
+  monitor: val_pesq        # early stopping / best-model metric
+  mode: max
+  patience: 12

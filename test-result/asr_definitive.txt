@@ -1,0 +1,36 @@
+loading whisper-small on cpu ...
+
+file                                  NATO  digits    grid     TOTAL 
+                                       /12     /10      /4       /26
+floor_none_unprocessed.wav               0       0       0      0   0%  DECODER GLITCH - chunk dropped
+floor_12dB.wav                           3      10       4     17  65%
+floor_18dB.wav                           4      10       4     18  69%
+floor_24dB.wav                           5       0       0      5  19%  DECODER GLITCH - chunk dropped
+floor_full_model.wav                     2       1       0      3  12%  DECODER GLITCH - chunk dropped
+floor_none_unprocessed.wav               0       9       4     13  50%
+floor_12dB.wav                           0       9       4     13  50%
+floor_18dB.wav                           0       7       3     10  38%
+floor_24dB.wav                           0       1       0      1   4%
+floor_full_model.wav                     0       2       1      3  12%
+floor_none_unprocessed.wav               1      10       4     15  58%  DECODER GLITCH - chunk dropped
+floor_12dB.wav                           1      10       4     15  58%  DECODER GLITCH - chunk dropped
+floor_18dB.wav                           2      10       4     16  62%  DECODER GLITCH - chunk dropped
+floor_24dB.wav                           1       9       4     14  54%
+floor_full_model.wav                     0       0       0      0   0%  DECODER GLITCH - chunk dropped
+
+(scale: >90%% operational, 70-89%% usable with repeats, 40-69%% marginal, <40%% not usable)
+  floor_none_unprocessed.wav     missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_12dB.wav                 missed NATO: bravo, charlie, delta, echo, foxtrot, sierra, tango, xray, zulu
+  floor_18dB.wav                 missed NATO: alpha, bravo, echo, foxtrot, sierra, tango, xray, zulu
+  floor_24dB.wav                 missed NATO: alpha, bravo, echo, sierra, tango, xray, zulu
+  floor_full_model.wav           missed NATO: alpha, bravo, charlie, echo, foxtrot, sierra, tango, victor, xray, zulu
+  floor_none_unprocessed.wav     missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_12dB.wav                 missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_18dB.wav                 missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_24dB.wav                 missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_full_model.wav           missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_none_unprocessed.wav     missed NATO: alpha, bravo, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_12dB.wav                 missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, xray, zulu
+  floor_18dB.wav                 missed NATO: alpha, bravo, delta, echo, foxtrot, sierra, tango, victor, xray, zulu
+  floor_24dB.wav                 missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, xray, zulu
+  floor_full_model.wav           missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu

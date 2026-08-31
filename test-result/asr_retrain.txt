@@ -1,0 +1,12 @@
+loading whisper-small on cpu ...
+
+file                                  NATO  digits    grid     TOTAL
+                                       /12     /10      /4       /26
+1_input.wav                              3       2       1      6  23%
+4_shipped_offline.wav                    1       5       3      9  35%
+5_lowsnr_offline.wav                     0       9       4     13  50%
+
+(scale: >90%% operational, 70-89%% usable with repeats, 40-69%% marginal, <40%% not usable)
+  1_input.wav                    missed NATO: delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  4_shipped_offline.wav          missed NATO: alpha, bravo, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  5_lowsnr_offline.wav           missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu

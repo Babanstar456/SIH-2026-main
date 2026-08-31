@@ -1,0 +1,12 @@
+{
+ "checkpoint": "C:\\dev\\SIH-2026\\checkpoints\\lowsnr_best.pt",
+ "onnx": "C:\\dev\\SIH-2026\\artifacts\\model_lowsnr_simple.onnx",
+ "max_abs_diff": 1.0523945093154907e-06,
+ "rel_to_rms": 5.7272576668765396e-05,
+ "match": true,
+ "frames": 3887,
+ "ms_p50": 4.2706999956863,
+ "ms_p95": 5.476419998740311,
+ "ms_mean": 4.460231206568935,
+ "rtf": 0.2787644504105584
+}

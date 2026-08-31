@@ -1,0 +1,20 @@
+ANSWER KEY - do not show the listener before the test
+=====================================================
+PART A  1 Alpha   2 Bravo   3 Charlie  4 Delta
+        5 Echo    6 Foxtrot 7 Sierra   8 Tango
+        9 Victor 10 Whiskey 11 X-ray  12 Zulu
+
+PART B  1 2 3 4 5 6 7 8 9 0     (spoken "one ... nine, zero")
+
+PART C  4 7 2 9
+
+SCORING
+  One mark per item, 26 total. Spelling does not matter; the word does.
+  Near-misses count as WRONG - "Sierra" heard as "Tango" is exactly the
+  confusion this test exists to detect.
+
+INTERPRETING THE TOTAL
+   90-100%   operational
+   70-89%    usable with repeats
+   40-69%    marginal - this is the "I catch some of it" band
+   under 40% not usable

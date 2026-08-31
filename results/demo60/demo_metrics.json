@@ -1,0 +1,23 @@
+{
+ "alignment_lag_samples": 256,
+ "duration_s": 60.0,
+ "gunshot_times_s": [
+  20.4,
+  25.48,
+  29.87,
+  32.87,
+  35.17,
+  39.63,
+  44.44,
+  48.34,
+  53.36,
+  55.97
+ ],
+ "n_gunshots": 10,
+ "pesq_before": 1.396,
+ "pesq_after": 2.19,
+ "stoi_before": 0.91,
+ "stoi_after": 0.946,
+ "si_sdr_before": 6.32,
+ "si_sdr_after": 13.01
+}

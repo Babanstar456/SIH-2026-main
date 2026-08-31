@@ -1,0 +1,59 @@
+{
+ "platform": "AMD64 Family 25 Model 124 Stepping 0, AuthenticAMD",
+ "python": "3.12.10",
+ "onnx": "C:\\Users\\Ayushi Kundu\\OneDrive\\Desktop\\SIH_2026\\artifacts\\model_simple.onnx",
+ "parameters": 48245,
+ "hop_ms": 16.0,
+ "window_ms": 32.0,
+ "onnx_runs": [
+  {
+   "threads": 1,
+   "frames": 800,
+   "ms_p50": 4.528149962425232,
+   "ms_p95": 6.005515088327228,
+   "ms_p99": 7.352772972080854,
+   "ms_mean": 4.728524372621905,
+   "ms_max": 11.962400050833821,
+   "rtf_mean": 0.29553277328886907,
+   "rtf_p95": 0.37534469302045176
+  },
+  {
+   "threads": 4,
+   "frames": 800,
+   "ms_p50": 4.843750037252903,
+   "ms_p95": 6.0635249479673785,
+   "ms_p99": 7.095433119684457,
+   "ms_mean": 4.9362164991907775,
+   "ms_max": 10.539199924096465,
+   "rtf_mean": 0.3085135311994236,
+   "rtf_p95": 0.37897030924796116
+  }
+ ],
+ "torch_offline": [
+  {
+   "threads": 1,
+   "seconds": 10.0,
+   "wall_s": 0.4205425998661667,
+   "rtf": 0.042054259986616674
+  },
+  {
+   "threads": 4,
+   "seconds": 10.0,
+   "wall_s": 0.43567689997144043,
+   "rtf": 0.04356768999714404
+  }
+ ],
+ "measured_streaming_delay": {
+  "delay_samples": 256,
+  "delay_ms": 16.0,
+  "equals_win_minus_hop": true
+ },
+ "latency_budget_ms": {
+  "chunk_buffering": 16.0,
+  "overlap_add_delay_measured": 16.0,
+  "model_compute_p95_1thread": 6.005515088327228,
+  "total_p95": 38.00551508832723,
+  "analysis_window_for_reference": 32.0,
+  "note": "Chunk buffering (16 ms) + measured overlap-add delay (16 ms) together equal the 32 ms analysis window: a sample is not released until every frame covering it has been computed. This is inherent to n_fft=512 and cannot be reduced without changing the framing. Reported in full rather than quoting the hop."
+ }
+}

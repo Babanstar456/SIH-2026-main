@@ -1,0 +1,127 @@
+# SIH 26052 - data configuration.
+# Data lives OUTSIDE the OneDrive folder on purpose: ~45 GB of audio and a
+# 50k-file site-packages tree would otherwise be synced by OneDrive.
+
+paths:
+  raw:      C:/SIH26052_data/raw
+  prepared: C:/SIH26052_data/prepared
+  manifests: manifests
+  testset:  C:/SIH26052_data/testset
+
+audio:
+  sr: 16000
+  n_fft: 512      # 32 ms window  - must match GTCRN exactly
+  hop: 256        # 16 ms hop     - the hardware team's chunk size
+  win: 512
+
+# Evaluation categories. Every result is reported per-category, never as a
+# single average: an overall mean can look healthy while gunshots fail.
+categories:
+  gunshot:
+    # Real firearm recordings (Zenodo 7004819) + UrbanSound8K gun_shot.
+    # ESC-50 has NO gun_shot class - fireworks is only a transient proxy.
+    sources: [gunshot_edge, urbansound8k/gun_shot, esc50/fireworks]
+    impulsive: true
+  artillery:
+    sources: [esc50/thunderstorm, esc50/glass_breaking]
+    impulsive: true
+  rotor:
+    sources: [esc50/helicopter, esc50/airplane]
+    impulsive: false
+  engine:
+    sources: [esc50/engine, esc50/train, esc50/chainsaw, urbansound8k/engine_idling, urbansound8k/drilling, urbansound8k/jackhammer]
+    impulsive: false
+  siren:
+    sources: [esc50/siren, esc50/car_horn, urbansound8k/siren, urbansound8k/car_horn]
+    impulsive: false
+  babble:
+    sources: [musan/speech]
+    impulsive: false
+    # MUSAN's speech/ holds SINGLE-SPEAKER recordings. One clip is an
+    # interfering talker, not babble - a different and much easier problem.
+    # Summing several unrelated voices is how babble is actually constructed.
+    layers: [4, 8]
+
+# Steady background layer, always present under the transients.
+background:
+  sources: [musan/noise, musan/music]
+  # Measured over ACTIVE SPEECH frames only.
+  #
+  # Raised from [-5, 15]. Burst energy is NOT counted in this figure, so the
+  # realised whole-clip SNR lands well below it: at [-5, 15] the frozen test set
+  # came out at a median of -0.4 dB with 63% of unprocessed clips sitting on the
+  # PESQ floor (<1.15), where the metric stops discriminating and no method can
+  # approach the PESQ 2.5 / STOI 0.85 targets. A test set has to span easy to
+  # hard to be informative, so results can be reported by input-SNR band.
+  # LOWERED for the deployment regime. The [0, 20] range above was chosen so the
+  # frozen TEST SET could discriminate - a sound reason for a measuring
+  # instrument, and the wrong range for TRAINING. It means the steady background
+  # is always QUIETER than the voice, so the model never once saw the case the
+  # product exists for: a soldier speaking while gunfire dominates. Real
+  # recordings from the field rig measured -5.9 dB and -12.3 dB, entirely
+  # outside what the model was trained on. Domain mismatch, not a tuning issue.
+  snr_db: [-12.0, 12.0]
+  n_sources: [1, 2]
+
+# The part the doc is emphatic about, and is right about: gunshots must be
+# injected as discrete sudden bursts, not blended evenly through the clip.
+bursts:
+  lambda: 1.5              # Poisson mean events per clip
+  force_min_prob: 0.7      # P(at least one burst) in NON-impulsive categories
+  # Negative => burst PEAK louder than speech RMS. Kept entirely negative on
+  # purpose: at +5 dB a "gunshot" peaks BELOW the speech level and below the
+  # background's own peaks (noise runs a 10-14 dB crest factor), so the marked
+  # transient was not actually the loudest thing in the clip - measured, the
+  # loudest residual sample fell outside the mask 40% of the time. A firearm
+  # beside the microphone dominates everything; that is the premise of the
+  # project. The analog limiter downstream compresses the extreme end anyway.
+  peak_snr_db: [-20.0, 0.0]
+  # A gunshot is a few ms of muzzle blast plus a ~300 ms tail. At 1.0 s each,
+  # two bursts covered half a 4 s clip - which is the even-blending failure the
+  # doc warns about wearing a burst costume.
+  max_event_s: 0.5
+  onset_pad_ms: 5.0
+
+  # Per-event augmentation. The impulsive pools are small and very unequal
+  # (gunshot ~1900 clips, artillery ~70), so without this the model can memorise
+  # the handful of artillery recordings rather than learn what a transient is.
+  augment:
+    enabled: true
+    gain_db: [-6.0, 6.0]
+    time_stretch: [0.85, 1.18]   # changes the decay tail, not the attack
+    polarity_flip: true          # free, and a gunshot's polarity is arbitrary
+    lowpass_prob: 0.35           # distance / air absorption
+    lowpass_hz: [2500, 7000]
+
+# Sampling weights per category. NOT uniform, and not purely by pool size:
+# impulsive noise is the hard case the model must not fail on, so it is
+# oversampled - but artillery is held below gunshot because its pool is ~27x
+# smaller and over-drawing from 70 clips teaches those 70 clips.
+category_weights:
+  gunshot: 3.0
+  artillery: 1.5
+  rotor: 1.0
+  engine: 1.0
+  siren: 1.0
+  babble: 1.0
+
+reverb:
+  prob: 0.5
+  early_ms: 50.0           # target = clean convolved with direct + early reflections
+
+# Models the fast analog limiter the hardware team puts between mic preamp and
+# ADC. The model must train on limited audio because that is what it receives.
+limiter:
+  prob: 0.8
+  threshold: [0.6, 0.95]
+
+mixture:
+  dur_s: 4.0
+  min_active_speech: 0.5   # reject crops with <50% active speech
+  out_peak: [0.2, 0.95]
+
+splits:
+  seed: 1337
+  # Disjointness is asserted in build_manifests.py, not assumed.
+  val_frac: 0.05
+  test_speakers_from: test-clean   # held-out LibriSpeech split entirely

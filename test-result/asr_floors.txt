@@ -1,0 +1,20 @@
+loading whisper-small on cpu ...
+
+file                                  NATO  digits    grid     TOTAL 
+                                       /12     /10      /4       /26
+floor_none_unprocessed.wav               3       9       4     16  62%
+floor_6dB.wav                            3       9       4     16  62%
+floor_9dB.wav                            0       1       0      1   4%
+floor_12dB.wav                           3       9       4     16  62%
+floor_18dB.wav                           4      10       4     18  69%
+floor_24dB.wav                           0      10       4     14  54%
+floor_full_model.wav                     2       9       4     15  58%
+
+(scale: >90%% operational, 70-89%% usable with repeats, 40-69%% marginal, <40%% not usable)
+  floor_none_unprocessed.wav     missed NATO: delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_6dB.wav                  missed NATO: delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_9dB.wav                  missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_12dB.wav                 missed NATO: alpha, charlie, delta, echo, foxtrot, sierra, tango, xray, zulu
+  floor_18dB.wav                 missed NATO: alpha, delta, echo, foxtrot, sierra, tango, xray, zulu
+  floor_24dB.wav                 missed NATO: alpha, bravo, charlie, delta, echo, foxtrot, sierra, tango, victor, whiskey, xray, zulu
+  floor_full_model.wav           missed NATO: alpha, bravo, delta, echo, foxtrot, sierra, tango, victor, xray, zulu

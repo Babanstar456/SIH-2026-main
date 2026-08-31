@@ -1,0 +1,62 @@
+READ-ALOUD SCRIPT  --  SIH 26052 microphone / enhancement test
+================================================================
+
+Setup
+-----
+  * Bluetooth OFF (this is the thing that muffled the last recording)
+  * Use your PHONE's built-in voice recorder app
+  * Hold the phone 10-15 cm from your mouth, mic end toward you
+  * Normal speaking voice. Do not shout, do not whisper.
+  * Speak at a steady, unhurried pace. Short pause between parts.
+
+Record TWO takes of the same script:
+  TAKE 1 - quiet room, no noise at all      -> save as  voice_dry.wav
+  TAKE 2 - gunfire playing from a SPEAKER   -> save as  voice_noisy.wav
+           (speaker across the room, loud enough to be realistic --
+            do NOT play it through earphones, the mic must hear it)
+
+Put both files in  C:\dev\SIH-2026\test-result\
+m4a is fine if that is all the recorder offers.
+
+
+================================================================
+PART 1 - sibilants and stops
+(these are the exact sounds missing from the last recording)
+
+  She sells sea shells by the sea shore.
+
+  The fifth ship shifted six sacks of steel.
+
+  Peter checked the thick stack of plates twice.
+
+  This is a test of the speech transmission system.
+
+
+PART 2 - phonetic alphabet
+(standard comms words, known to any listener)
+
+  Alpha. Bravo. Charlie. Delta. Echo. Foxtrot.
+
+  Sierra. Tango. Victor. Whiskey. X-ray. Zulu.
+
+
+PART 3 - digits
+
+  One, two, three, four, five,
+  six, seven, eight, nine, zero.
+
+
+PART 4 - tactical phrases
+
+  Command, this is Bravo Two, radio check, over.
+
+  Position secured at grid four seven two nine.
+
+  Requesting immediate support at checkpoint six.
+
+  Say again your last, you are breaking up, over.
+
+  Message received and understood. Out.
+
+================================================================
+END -- roughly 45 seconds at a normal pace.
