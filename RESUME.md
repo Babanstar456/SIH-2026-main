@@ -94,6 +94,8 @@ That produced `checkpoints/lowsnr_best.pt`, which beats the shipped model
 substantially on real audio (take 3: 69% vs the shipped model's far worse
 performance at the same depth). Next steps:
 
+**Windows (PowerShell):**
+
 ```powershell
 $PY = "C:\SIH26052_data\.venv\Scripts\python.exe"
 
@@ -104,6 +106,20 @@ $PY = "C:\SIH26052_data\.venv\Scripts\python.exe"
 # isolate the consonant term - the lowsnr run changed TWO things at once
 & $PY -m src.train --tag lowsnr_noconsonant --data-config configs\data_lowsnr.yaml `
       --w-transient 0.0 --w-consonant 0.0
+```
+
+**Linux (bash):**
+
+```bash
+PY=~/SIH26052_data/.venv/bin/python
+
+# push lower still
+$PY -m src.train --tag lowsnr18 --data-config configs/data_lowsnr.yaml \
+    --w-transient 0.0 --w-consonant 1.0     # then edit snr_db to [-18, 6]
+
+# isolate the consonant term - the lowsnr run changed TWO things at once
+$PY -m src.train --tag lowsnr_noconsonant --data-config configs/data_lowsnr.yaml \
+    --w-transient 0.0 --w-consonant 0.0
 ```
 
 **The `lowsnr` run changed both the SNR range and the loss, so attribution
@@ -198,9 +214,19 @@ earphones — the mic must hear it acoustically), and **leave ~10 s of gunfire
 before speaking** so a clean noise bed can be extracted.
 
 Verify any new recording before trusting a test built on it:
+
+**Windows (PowerShell):**
+
 ```powershell
 & $PY scripts\asr_score.py --model medium --inputs your_dry_take.wav
 ```
+
+**Linux (bash):**
+
+```bash
+$PY scripts/asr_score.py --model medium --inputs your_dry_take.wav
+```
+
 A good dry take should score well above 70%. If it does not, fix the capture
 before anything else.
 
@@ -210,7 +236,8 @@ before anything else.
 
 RESUME.md previously documented Windows Smart App Control blocking PyTorch's
 unsigned DLLs. **This is stale.** Torch 2.13.0+cu126 loads and trains normally on
-this machine, GPU included, even with the policy still reporting `1` (enforcing):
+this machine, GPU included, even with the policy still reporting `1` (enforcing).
+Windows-only check — Smart App Control has no Linux equivalent:
 
 ```powershell
 (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy" `
@@ -247,7 +274,10 @@ bound `S` to `src.framing` (NumPy-only, no `stft`/`istft`) while two tests calle
 
 ## Rebuilding from nothing
 
-```powershell
+**Windows (PowerShell — run from Git Bash / WSL, or PowerShell if `bash` is on
+PATH) / Linux (bash) — identical:**
+
+```bash
 # 1. environment - see README.md "Full setup from scratch"
 # 2. data
 bash scripts/download_tier1.sh
@@ -263,9 +293,21 @@ group COUNTS it prints, not just that the assertions passed** — degenerate spl
 are trivially disjoint. Healthy output has `background val=80`, `babble val=21`.
 
 If you stop the pipeline mid-run, reap the workers:
+
+**Windows (PowerShell):**
+
 ```powershell
 Get-Process python | Stop-Process -Force
 ```
+
+**Linux (bash):**
+
+```bash
+pkill -f python
+```
+
+(kills python processes broadly, matching the intent of the PowerShell
+one-liner it replaces)
 
 ---
 

@@ -48,12 +48,22 @@ recognition moved the wrong way.
 
 The interpreter is **not** on PATH and lives outside the project directory:
 
+**Windows (PowerShell):**
+
 ```powershell
 $PY = "C:\SIH26052_data\.venv\Scripts\python.exe"
 ```
 
+**Linux (bash):**
+
+```bash
+PY=~/SIH26052_data/.venv/bin/python
+```
+
 Python 3.12, not the system 3.14 — PyTorch ships CPU-only wheels for 3.14, so
 3.14 silently gives you no GPU and a ~50x slowdown with no error.
+
+**Windows (PowerShell):**
 
 ```powershell
 .\run.ps1 status      # what is downloaded / built
@@ -68,7 +78,24 @@ Python 3.12, not the system 3.14 — PyTorch ships CPU-only wheels for 3.14, so
 bash scripts/auto_pipeline.sh   # unattended chain, resumable, skips done work
 ```
 
+**Linux (bash):**
+
+```bash
+./run.sh status      # what is downloaded / built
+./run.sh data        # extract + resample + manifests + mixture QA
+./run.sh testset     # freeze evaluation set + VoiceBank-DEMAND benchmark
+./run.sh baseline    # the comparison table - run BEFORE training
+./run.sh train       # fine-tune
+./run.sh ablate      # same run with the transient term disabled
+./run.sh finish      # evaluate + bench + export + handoff bundle
+./run.sh test        # unit tests
+
+bash scripts/auto_pipeline.sh   # unattended chain, resumable, skips done work
+```
+
 ### Measuring intelligibility - do this before claiming any improvement
+
+**Windows (PowerShell):**
 
 ```powershell
 # Word recognition, with a recogniser standing in for a listener. USE medium for
@@ -84,20 +111,57 @@ bash scripts/auto_pipeline.sh   # unattended chain, resumable, skips done work
       --out-dir test-resultloors
 ```
 
+**Linux (bash):**
+
+```bash
+# Word recognition, with a recogniser standing in for a listener. USE medium for
+# anything conclusive: whisper-small is too weak on this audio and fails
+# unpredictably in ways that look like results.
+$PY scripts/asr_score.py --model medium --inputs a.wav b.wav
+$PY scripts/asr_score.py --model medium --repeats 3 --inputs a.wav  # stability
+$PY scripts/asr_score.py --model medium --show-transcript --inputs a.wav
+
+# Suppression depth vs word survival - the tradeoff curve. Optimise the PAIR,
+# never suppression alone; that is exactly how this went wrong.
+$PY scripts/floor_sweep.py --input noisy.wav --ckpt checkpoints/lowsnr_best.pt \
+    --out-dir test-result/floors
+```
+
 A row flagged `DECODER GLITCH` is **not a measurement** - discard it, never
 average it in. See "Measurement traps" below.
 
 Tests:
+
+**Windows (PowerShell):**
+
 ```powershell
 & $PY -m pytest tests -q
 & $PY -m pytest tests/test_core.py::test_wola_roundtrip_is_exact -q   # single test
 ```
 
+**Linux (bash):**
+
+```bash
+$PY -m pytest tests -q
+$PY -m pytest tests/test_core.py::test_wola_roundtrip_is_exact -q   # single test
+```
+
 Fast checks that catch most breakage in under a minute:
+
+**Windows (PowerShell):**
+
 ```powershell
 & $PY scripts\smoke_train.py --steps 20 --batch 24 --workers 8   # data->loss->backward
 & $PY -m src.train --tag smoke --epochs 2 --epoch-size 480 --val-size 96
 & $PY scripts\qa_mixtures.py --n 24                              # renders AND checks
+```
+
+**Linux (bash):**
+
+```bash
+$PY scripts/smoke_train.py --steps 20 --batch 24 --workers 8    # data->loss->backward
+$PY -m src.train --tag smoke --epochs 2 --epoch-size 480 --val-size 96
+$PY scripts/qa_mixtures.py --n 24                                # renders AND checks
 ```
 
 Training resumes from `checkpoints/<tag>_last.pt` with `--resume`; an
@@ -499,7 +563,8 @@ this check working — it is what makes numbers on our own test set credible.
   suite is `19 passed`, not "17 pass + 2 skip": those two tests were BROKEN, not
   skipping — `tests/test_core.py` bound `S` to `src.framing` (NumPy-only, no
   stft/istft) while two tests called `S.stft`, so they errored instead of
-  skipping. Fixed. Check the policy with:
+  skipping. Fixed. Check the policy with (Windows-only — Smart App Control has
+  no Linux equivalent, so there is nothing to check or port on that platform):
   ```powershell
   (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy" `
     -Name VerifiedAndReputablePolicyState).VerifiedAndReputablePolicyState
