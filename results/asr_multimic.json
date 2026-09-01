@@ -1,0 +1,24 @@
+{
+ "note": "whisper-medium, temperature=0.0, whole-file decode, 26 known tokens (NATO+digits+grid). Clip: results/multimic_demo/, 45s synthetic mixture, real dry speech + real gunfire, peak SNR -6dB. See scripts/asr_score.py and CLAUDE.md for methodology and known traps.",
+ "command": "python scripts/asr_score.py --model medium --inputs results/multimic_demo/{target,primary,nlms,nlms_gated,lms,rls,neural,hybrid}.wav",
+ "scores": {
+  "target.wav": {"nato": 7, "digits": 10, "grid": 4, "total": 21, "pct": 81},
+  "primary.wav": {"nato": 2, "digits": 10, "grid": 4, "total": 16, "pct": 62},
+  "nlms.wav": {"nato": 0, "digits": 10, "grid": 4, "total": 14, "pct": 54},
+  "nlms_gated.wav": {"nato": 2, "digits": 10, "grid": 4, "total": 16, "pct": 62},
+  "lms.wav": {"nato": 2, "digits": 10, "grid": 4, "total": 16, "pct": 62},
+  "rls.wav": {"nato": 0, "digits": 0, "grid": 0, "total": 0, "pct": 0},
+  "neural.wav": {"nato": 0, "digits": 10, "grid": 4, "total": 14, "pct": 54},
+  "hybrid.wav": {"nato": 0, "digits": 1, "grid": 0, "total": 1, "pct": 4}
+ },
+ "labels": {
+  "target.wav": "clean speech, gain-matched (ceiling, not the enhancement target)",
+  "primary.wav": "unprocessed noisy mixture (primary mic only)",
+  "nlms.wav": "NLMS reference-mic cancellation",
+  "nlms_gated.wav": "NLMS, VAD-gated adaptation",
+  "lms.wav": "plain LMS, fixed conservative step",
+  "rls.wav": "RLS reference-mic cancellation",
+  "neural.wav": "shipped GTCRN model, single mic",
+  "hybrid.wav": "NLMS + GTCRN in series"
+ }
+}

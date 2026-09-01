@@ -19,7 +19,12 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .venv/
+.venv-dfn/
 venv/
+
+# Machine-specific service config (device indices etc.) - see
+# dhwanik.env.example for the template that IS committed.
+dhwanik.env
 
 # Editors / OS
 .vscode/

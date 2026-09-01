@@ -46,39 +46,14 @@ recognition moved the wrong way.
 
 ## Commands
 
-The interpreter is **not** on PATH and lives outside the project directory:
-
-**Windows (PowerShell):**
-
-```powershell
-$PY = "C:\SIH26052_data\.venv\Scripts\python.exe"
-```
-
-**Linux (bash):**
+The interpreter is **not** on PATH and lives in a local venv at the repo root:
 
 ```bash
-PY=~/SIH26052_data/.venv/bin/python
+PY=.venv/bin/python
 ```
 
 Python 3.12, not the system 3.14 — PyTorch ships CPU-only wheels for 3.14, so
 3.14 silently gives you no GPU and a ~50x slowdown with no error.
-
-**Windows (PowerShell):**
-
-```powershell
-.\run.ps1 status      # what is downloaded / built
-.\run.ps1 data        # extract + resample + manifests + mixture QA
-.\run.ps1 testset     # freeze evaluation set + VoiceBank-DEMAND benchmark
-.\run.ps1 baseline    # the comparison table - run BEFORE training
-.\run.ps1 train       # fine-tune
-.\run.ps1 ablate      # same run with the transient term disabled
-.\run.ps1 finish      # evaluate + bench + export + handoff bundle
-.\run.ps1 test        # unit tests
-
-bash scripts/auto_pipeline.sh   # unattended chain, resumable, skips done work
-```
-
-**Linux (bash):**
 
 ```bash
 ./run.sh status      # what is downloaded / built
@@ -94,24 +69,6 @@ bash scripts/auto_pipeline.sh   # unattended chain, resumable, skips done work
 ```
 
 ### Measuring intelligibility - do this before claiming any improvement
-
-**Windows (PowerShell):**
-
-```powershell
-# Word recognition, with a recogniser standing in for a listener. USE medium for
-# anything conclusive: whisper-small is too weak on this audio and fails
-# unpredictably in ways that look like results.
-& $PY scriptssr_score.py --model medium --inputs a.wav b.wav
-& $PY scriptssr_score.py --model medium --repeats 3 --inputs a.wav  # stability
-& $PY scriptssr_score.py --model medium --show-transcript --inputs a.wav
-
-# Suppression depth vs word survival - the tradeoff curve. Optimise the PAIR,
-# never suppression alone; that is exactly how this went wrong.
-& $PY scriptsloor_sweep.py --input noisy.wav --ckpt checkpoints\lowsnr_best.pt `
-      --out-dir test-resultloors
-```
-
-**Linux (bash):**
 
 ```bash
 # Word recognition, with a recogniser standing in for a listener. USE medium for
@@ -130,16 +87,39 @@ $PY scripts/floor_sweep.py --input noisy.wav --ckpt checkpoints/lowsnr_best.pt \
 A row flagged `DECODER GLITCH` is **not a measurement** - discard it, never
 average it in. See "Measurement traps" below.
 
-Tests:
+### Live, edge, and multi-mic tooling (added in the Linux-migration session)
 
-**Windows (PowerShell):**
+```bash
+# Live mic -> model -> speaker, on this machine's own audio devices
+python main.py --list                     # find device indices
+python main.py                            # run with defaults (floor -18dB)
+python main.py --floor-db none            # raw model, no suppression cap
 
-```powershell
-& $PY -m pytest tests -q
-& $PY -m pytest tests/test_core.py::test_wola_roundtrip_is_exact -q   # single test
+# Torch-free latency/RTF benchmark - copy this to an actual embedded target,
+# a number measured on a laptop does not transfer to an ARM board
+$PY scripts/bench_edge.py --onnx artifacts/model_lowsnr_simple.onnx
+
+# Two-mic reference-channel evaluation: NLMS/LMS/RLS vs neural vs hybrid.
+# SYNTHETIC reference channel - see src/baselines/reference_mic.py docstring
+# before trusting any ranking here.
+$PY scripts/eval_multimic.py --duration 45 --snr-db -6
+
+# Consolidate every method measured on one clip into one table + Pareto plot
+$PY scripts/aggregate_results.py
+
+# Rebuild the blind listening-test kit (randomized per listener, known
+# provenance - see test-result/listening_test/NOTE_see_v2.txt for why the
+# original TEST_A.wav should not be used)
+$PY scripts/make_listening_test.py --listeners 3
+
+# What does deep suppression actually remove? Spectrogram diff between two
+# floor settings on the SAME input (sample-aligned, no timing correction
+# needed). Answered the "mechanism" question in RESUME.md - see there.
+$PY scripts/spectrogram_diff.py --a test-result/floors/floor_18dB.wav \
+    --b test-result/floors/floor_full_model.wav
 ```
 
-**Linux (bash):**
+Tests:
 
 ```bash
 $PY -m pytest tests -q
@@ -147,16 +127,6 @@ $PY -m pytest tests/test_core.py::test_wola_roundtrip_is_exact -q   # single tes
 ```
 
 Fast checks that catch most breakage in under a minute:
-
-**Windows (PowerShell):**
-
-```powershell
-& $PY scripts\smoke_train.py --steps 20 --batch 24 --workers 8   # data->loss->backward
-& $PY -m src.train --tag smoke --epochs 2 --epoch-size 480 --val-size 96
-& $PY scripts\qa_mixtures.py --n 24                              # renders AND checks
-```
-
-**Linux (bash):**
 
 ```bash
 $PY scripts/smoke_train.py --steps 20 --batch 24 --workers 8    # data->loss->backward
@@ -171,18 +141,19 @@ interrupted run costs one epoch.
 
 | what | where |
 |---|---|
-| code | this repository (`C:\dev\SIH-2026`) |
-| venv | `C:\SIH26052_data\.venv` (~4.7 GB, 47k files) |
-| raw + prepared datasets | `C:\SIH26052_data\{raw,prepared}` (~59 GB) |
-| frozen test set | `C:\SIH26052_data\testset` |
-| VoiceBank-DEMAND benchmark | `C:\SIH26052_data\voicebank_demand` |
+| code | this repository |
+| venv | `.venv` at the repo root (~4.7 GB, 47k files) |
+| raw + prepared datasets | `~/SIH26052_data/{raw,prepared}` (~59 GB) |
+| frozen test set | `~/SIH26052_data/testset` |
+| VoiceBank-DEMAND benchmark | `~/SIH26052_data/voicebank_demand` |
 
-Data and venv sit **outside the repo on purpose** — 64 GB of audio and a
-50,000-file `site-packages` tree cannot go in git, and were originally kept out
-of OneDrive because it would sync them continuously. Everything there is
-regenerable from `scripts/download_*.sh`. `manifests/manifest.json` is also not
-committed: it is 21 MB of machine-specific absolute paths, rebuilt by
-`build_manifests.py`.
+Datasets sit **outside the repo on purpose** — 64 GB of audio cannot go in
+git. The venv is gitignored rather than relocated: a 50,000-file
+`site-packages` tree has no business in version control either, but `run.sh`
+expects it at `.venv` inside the repo directory (override with `$SIH_PY`).
+Everything under `~/SIH26052_data` is regenerable from `scripts/download_*.sh`.
+`manifests/manifest.json` is also not committed: it is 21 MB of
+machine-specific absolute paths, rebuilt by `build_manifests.py`.
 
 ## Architecture
 
@@ -555,19 +526,8 @@ this check working — it is what makes numbers on our own test set credible.
   weight down accordingly; `scripts/download_fsd50k_eval.sh` fills the gap.
 - **Drone/quadcopter audio is poorly covered** by open corpora. Helicopter is
   fine; drones are not.
-- **Windows Smart App Control** can block PyTorch's unsigned DLLs
-  (`WinError 4551` on `c10.dll`). **Currently NOT blocking on this machine** —
-  torch 2.13.0+cu126 loads and trains with GPU even while the policy still
-  reports `1` (enforcing), so treat older notes to the contrary as stale. The
-  torch-free inference split remains correct and worth keeping. Note also the
-  suite is `19 passed`, not "17 pass + 2 skip": those two tests were BROKEN, not
-  skipping — `tests/test_core.py` bound `S` to `src.framing` (NumPy-only, no
-  stft/istft) while two tests called `S.stft`, so they errored instead of
-  skipping. Fixed. Check the policy with (Windows-only — Smart App Control has
-  no Linux equivalent, so there is nothing to check or port on that platform):
-  ```powershell
-  (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy" `
-    -Name VerifiedAndReputablePolicyState).VerifiedAndReputablePolicyState
-  # 0 = off, 1 = ON (enforcing), 2 = evaluation
-  ```
-  Turning it off is irreversible without a Windows reset. See RESUME.md.
+- The torch-free inference split remains correct and worth keeping. Note also
+  the suite is `19 passed`, not "17 pass + 2 skip": those two tests were
+  BROKEN, not skipping — `tests/test_core.py` bound `S` to `src.framing`
+  (NumPy-only, no stft/istft) while two tests called `S.stft`, so they errored
+  instead of skipping. Fixed.

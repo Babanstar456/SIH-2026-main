@@ -64,8 +64,37 @@ class StreamingEnhancer:
         self.ola = np.zeros(WIN, dtype=np.float32)
         self.norm = np.zeros(WIN, dtype=np.float32)
         self.wsq = self.window ** 2
+        self.consecutive_failures = 0
 
     def process_chunk(self, chunk: np.ndarray) -> np.ndarray:
+        """Safe entry point: never raises, never emits non-finite audio.
+
+        This is what `run_live`/`main.py` call. An audio callback that raises
+        kills the whole stream, and one that returns NaN/Inf is worse - it
+        plays back as a loud, undocumented fault. Communication must continue
+        even if the model itself fails (crashed ORT session, corrupted cache,
+        unexpected input), so on ANY failure this resets internal state and
+        falls back to passing the raw chunk straight through - unprocessed,
+        not silence - exactly the fallback described in this project's own
+        failure-mode expectations (`docs/failure_modes.md`). The cost is a
+        brief re-convergence period after a fault, since the OLA/cache state
+        was zeroed; that is an acceptable trade against "the mic goes dead" or
+        "the output explodes".
+        """
+        try:
+            out = self._process_chunk_unsafe(chunk)
+        except Exception:  # noqa: BLE001 - any failure must degrade, not crash
+            self.reset()
+            self.consecutive_failures += 1
+            return np.clip(np.asarray(chunk, dtype=np.float32), -1.0, 1.0)
+        if not np.all(np.isfinite(out)):
+            self.reset()
+            self.consecutive_failures += 1
+            return np.clip(np.asarray(chunk, dtype=np.float32), -1.0, 1.0)
+        self.consecutive_failures = 0
+        return out
+
+    def _process_chunk_unsafe(self, chunk: np.ndarray) -> np.ndarray:
         """One HOP-sized chunk in, one HOP-sized enhanced chunk out."""
         assert len(chunk) == HOP, f"expected {HOP} samples, got {len(chunk)}"
         self.in_buf = np.concatenate([self.in_buf[HOP:], chunk.astype(np.float32)])

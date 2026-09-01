@@ -1,0 +1,66 @@
+# Dependency groups, not one flat list, because most of this project runs
+# WITHOUT PyTorch on purpose (see CLAUDE.md: "the inference path must not
+# import PyTorch"). Versions below are pinned to what is actually verified
+# working together in this repo's own .venv (Python 3.14, Linux, CPU-only) -
+# not a blind `pip freeze`. Anything unpinned has not been exercised in this
+# environment and should be verified before relying on an exact version.
+#
+#   pip install -r requirements.txt              # everything below
+#   pip install -r requirements.txt --no-deps ... # if you only want a subset,
+#                                                  # copy the relevant section
+
+# --- core inference path (no PyTorch needed - runs the shipped ONNX model) ---
+numpy==2.5.2
+soundfile==0.14.0
+soxr==1.1.0
+onnxruntime==1.29.0
+sounddevice==0.5.6
+PyYAML==6.0.3
+
+# --- training / export / full evaluation (needs PyTorch) ---
+torch==2.13.0+cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+einops==0.8.2
+scipy==1.18.1
+onnx==1.22.0
+tqdm==4.70.0
+pandas
+
+# --- reference metric implementations (never hand-roll these - see CLAUDE.md) ---
+pesq==0.0.4
+pystoi==0.4.1
+
+# --- classical / adaptive baselines ---
+noisereduce
+pyrnnoise==0.4.3
+# pyrnnoise pulls these in for its high-level API, which has a known upstream
+# version-skew bug (Reader.rate / Graph.__init__ mismatch) - this project
+# calls its low-level pyrnnoise.rnnoise.process_mono_frame binding directly
+# instead, so only the compiled librnnoise.so matters, not the Python wrapper.
+audiolab==0.5.2
+av==18.1.0
+
+# --- testing ---
+pytest==9.1.1
+
+# --- optional: model complexity report (src/models/gtcrn.py, lazy import) ---
+ptflops
+
+# --- optional: onnx graph simplification (scripts/export_onnx.py path) ---
+onnxsim
+
+# --- optional: automated word-recognition scoring (scripts/asr_score.py) ---
+# Heavy - downloads a ~1.5 GB whisper-medium checkpoint on first run. Not
+# installed/verified in this session; install only if you need asr_score.py.
+# faster-whisper
+# jiwer
+
+# --- optional: plotting (Pareto-style latency/quality tradeoff plots) ---
+matplotlib==3.11.1
+
+# --- NOT included: DeepFilterNet ---
+# deepfilternet hard-pins numpy<2.0, which breaks pystoi/scipy in THIS
+# environment (numpy>=2.0 required). It lives in a separate, isolated venv
+# (.venv-dfn) instead - see requirements-deepfilternet.txt and
+# scripts/dfn_worker.py, invoked via subprocess from src/methods.py so the
+# main environment never has to compromise on its numpy version.

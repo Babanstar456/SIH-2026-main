@@ -1,0 +1,15 @@
+TEST_A.wav in this folder has no recorded provenance anywhere in this repo or
+its scripts - nothing says which processing condition produced it
+(unprocessed? floor-capped? full model?). Checked against every real
+recording and every floor-sweep variant in the repo; no match found. A score
+against it cannot be interpreted and should not be used as evidence.
+
+Use test-result/listening_test_v2/ instead - built by
+scripts/make_listening_test.py from the take-3 floor-sweep files, which DO
+have documented provenance (see README.md / RESUME.md). It ships one packet
+per listener with the three conditions independently randomized, plus a
+master key.
+
+This file (TEST_A.wav) is left in place rather than deleted, since its origin
+is unknown, not necessarily wrong - if you know what produced it, please
+record that here or in RESUME.md.
